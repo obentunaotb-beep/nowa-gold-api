@@ -1,3 +1,6 @@
 flask
-playwright
+requests
+beautifulsoup4
 gunicorn
+flask
+playwright
