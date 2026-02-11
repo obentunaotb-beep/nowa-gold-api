@@ -50,3 +50,9 @@ def gold():
 
 if __name__ == "__main__":
     app.run()
+import asyncio
+from playwright.async_api import async_playwright
+
+async def install_browsers():
+    from playwright._impl._driver import get_driver
+    await get_driver().install()
