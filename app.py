@@ -11,7 +11,7 @@ async def fetch_price_and_button(url, button_text):
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
-        await page.goto(url, wait_until="networkidle")  # Tüm JS yüklenene kadar bekle
+        await page.goto(url, wait_until="networkidle")  # JS yüklenene kadar bekle
 
         # Fiyatı çek
         price_element = await page.query_selector("span[data-type='price']")
@@ -28,24 +28,8 @@ async def fetch_price_and_button(url, button_text):
         return {"price": price, "active": active}
 
 # ------------------------
-# Flask Route
+# URL'ler
 # ------------------------
-@app.route("/gold")
-def gold():
-    urls = {
+urls = {
     "ares": {
-        "buy": "https://www.klasgame.com/mmorpg-oyunlar/nowa-online-world/nowa-online-world-10-gb",
-        "sell": "https://www.klasgame.com/satis-yap/mmorpg-oyunlar/nowa-online-world/nowa-online-world-gold/nowa-online-world-10-gb"
-    },
-    "ultimate": {
-        "buy": "https://www.klasgame.com/mmorpg-oyunlar/nowa-online-world/nowa-online-world-ultimate-1m",
-        "sell": "https://www.klasgame.com/satis-yap/mmorpg-oyunlar/nowa-online-world/nowa-online-world-gold/nowa-online-world-ultimate-1m"
-    }
-}
-
-import asyncio
-from playwright.async_api import async_playwright
-
-async def install_browsers():
-    from playwright._impl._driver import get_driver
-    await get_driver().install()
+        "buy": "https://www.klasgame.com/mmorpg-oyunlar/nowa-online-world/nowa-online-world
