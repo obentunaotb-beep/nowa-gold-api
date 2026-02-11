@@ -33,13 +33,15 @@ async def fetch_price_and_button(url, button_text):
 @app.route("/gold")
 def gold():
     urls = {
-        "ares": {
-            "buy": "https://www.klasgame.com/mmorpg-oyunlar/nowa-online-world/nowa-online-world-gold/nowa-online-world-10-gb",
-            "sell": "https://www.klasgame.com/satis-yap/mmorpg-oyunlar/nowa-online-world/nowa-online-world-gold/nowa-online-world-10-gb"
-        },
-        "ultimate": {
-            "buy": "https://www.klasgame.com/mmorpg-oyunlar/nowa-online-world/no
-
+    "ares": {
+        "buy": "https://www.klasgame.com/mmorpg-oyunlar/nowa-online-world/nowa-online-world-10-gb",
+        "sell": "https://www.klasgame.com/satis-yap/mmorpg-oyunlar/nowa-online-world/nowa-online-world-gold/nowa-online-world-10-gb"
+    },
+    "ultimate": {
+        "buy": "https://www.klasgame.com/mmorpg-oyunlar/nowa-online-world/nowa-online-world-ultimate-1m",
+        "sell": "https://www.klasgame.com/satis-yap/mmorpg-oyunlar/nowa-online-world/nowa-online-world-gold/nowa-online-world-ultimate-1m"
+    }
+}
 
 import asyncio
 from playwright.async_api import async_playwright
