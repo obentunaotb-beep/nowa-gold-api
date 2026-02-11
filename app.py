@@ -1,55 +1,51 @@
 from flask import Flask, jsonify
-import requests
-from bs4 import BeautifulSoup
+import asyncio
+from playwright.async_api import async_playwright
 
 app = Flask(__name__)
 
-headers = {
-    "User-Agent": "Mozilla/5.0"
-}
-
-def get_price_and_status(url, button_text):
-    r = requests.get(url, headers=headers)
-    soup = BeautifulSoup(r.text, "html.parser")
-
-    # Fiyat çekme
-    price_tag = soup.find("span", {"data-type": "price"})
-    price = price_tag.text.strip() if price_tag else None
-
-    # Buton kontrolü
-    button = soup.find("button", string=lambda text: text and button_text in text)
-    active = False
-
-    if button and not button.has_attr("disabled"):
-        active = True
-
-    return {
-        "price": price,
-        "active": active
-    }
+async def fetch_price_and_button(url, button_text):
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page()
+        await page.goto(url)
+        # Fiyatı çek
+        price_element = await page.query_selector("span[data-type='price']")
+        price = await price_element.inner_text() if price_element else None
+        # Buton aktif mi?
+        button_element = await page.query_selector(f"button:has-text('{button_text}')")
+        active = False
+        if button_element:
+            disabled = await button_element.get_attribute("disabled")
+            active = disabled is None
+        await browser.close()
+        return {"price": price, "active": active}
 
 @app.route("/gold")
 def gold():
-
-    ares_buy_url = "https://www.klasgame.com/mmorpg-oyunlar/nowa-online-world/nowa-online-world-gold/nowa-online-world-10-gb"
-    ares_sell_url = "https://www.klasgame.com/satis-yap/mmorpg-oyunlar/nowa-online-world/nowa-online-world-gold/nowa-online-world-10-gb"
-
-    ultimate_buy_url = "https://www.klasgame.com/mmorpg-oyunlar/nowa-online-world/nowa-online-world-gold/nowa-online-world-ultimate-1m"
-    ultimate_sell_url = "https://www.klasgame.com/satis-yap/mmorpg-oyunlar/nowa-online-world/nowa-online-world-gold/nowa-online-world-ultimate-1m"
-
-    return jsonify({
+    urls = {
         "ares": {
-            "buy": get_price_and_status(ares_buy_url, "Sepete Ekle"),
-            "sell": get_price_and_status(ares_sell_url, "Satış Yap")
+            "buy": "https://www.klasgame.com/mmorpg-oyunlar/nowa-online-world/nowa-online-world-gold/nowa-online-world-10-gb",
+            "sell": "https://www.klasgame.com/satis-yap/mmorpg-oyunlar/nowa-online-world/nowa-online-world-gold/nowa-online-world-10-gb"
         },
         "ultimate": {
-            "buy": get_price_and_status(ultimate_buy_url, "Sepete Ekle"),
-            "sell": get_price_and_status(ultimate_sell_url, "Satış Yap")
+            "buy": "https://www.klasgame.com/mmorpg-oyunlar/nowa-online-world/nowa-online-world-gold/nowa-online-world-ultimate-1m",
+            "sell": "https://www.klasgame.com/satis-yap/mmorpg-oyunlar/nowa-online-world/nowa-online-world-gold/nowa-online-world-ultimate-1m"
         }
-    })
+    }
+
+    results = {}
+
+    for server, data in urls.items():
+        results[server] = {}
+        for action, url in data.items():
+            results[server][action] = asyncio.run(fetch_price_and_button(url, "Sepete Ekle" if action=="buy" else "Satış Yap"))
+
+    return jsonify(results)
 
 if __name__ == "__main__":
     app.run()
+
 import asyncio
 from playwright.async_api import async_playwright
 
