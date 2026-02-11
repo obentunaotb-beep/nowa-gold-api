@@ -32,4 +32,32 @@ async def fetch_price_and_button(url, button_text):
 # ------------------------
 urls = {
     "ares": {
-        "buy": "https://www.klasgame.com/mmorpg-oyunlar/nowa-online-world/nowa-online-world
+        "buy": "https://www.klasgame.com/mmorpg-oyunlar/nowa-online-world/nowa-online-world-10-gb",
+        "sell": "https://www.klasgame.com/satis-yap/mmorpg-oyunlar/nowa-online-world/nowa-online-world-gold/nowa-online-world-10-gb"
+    },
+    "ultimate": {
+        "buy": "https://www.klasgame.com/mmorpg-oyunlar/nowa-online-world/nowa-online-world-ultimate-1m",
+        "sell": "https://www.klasgame.com/satis-yap/mmorpg-oyunlar/nowa-online-world/nowa-online-world-gold/nowa-online-world-ultimate-1m"
+    }
+}
+
+# ------------------------
+# Async Route
+# ------------------------
+@app.route("/gold")
+async def gold():
+    results = {}
+
+    for server, data in urls.items():
+        results[server] = {}
+        for action, url in data.items():
+            button_text = "Sepete Ekle" if action == "buy" else "Satış Yap"
+            results[server][action] = await fetch_price_and_button(url, button_text)
+
+    return jsonify(results)
+
+# ------------------------
+# Uygulamayı Başlat
+# ------------------------
+if __name__ == "__main__":
+    app.run()
