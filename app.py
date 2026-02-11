@@ -70,3 +70,12 @@ def gold():
 
 if __name__ == "__main__":
     app.run()
+    import requests
+
+url = "https://www.klasgame.com/mmorpg-oyunlar/nowa-online-world/nowa-online-world-gold/nowa-online-world-10-gb"
+
+r = requests.get(url)
+
+print(r.status_code)
+print(r.text[:500])
+
